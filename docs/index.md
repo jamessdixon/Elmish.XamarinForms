@@ -28,6 +28,12 @@ Getting started
 
        dotnet new fabulous-app -n SqueakyApp
 
+       or
+       
+       File -> New Solution -> Multiplatofrm App -> Blank Form App (F#)
+       On the next page, make sure you select Use .Net Standard in the Shared Code section
+       <img src="https://user-images.githubusercontent.com/7204669/067b7130-d840-46c6-8586-440d06dc1d9c.png" width="100">
+
 4. Open, edit, build and deploy in Visual Studio, Visual Studio for Mac and/or "msbuild" command line
 
        SqueakyApp/SqueakyApp.sln
@@ -37,6 +43,9 @@ By default iOS and Android projects are created. For WPF apps use `--WPF`, for e
    Android only: dotnet new fabulous-app -n SqueakyApp --iOS=false
    iOS only:     dotnet new fabulous-app -n SqueakyApp --Android=false
    WPF only:     dotnet new fabulous-app -n SqueakyApp --WPF --Android=false --iOS=false
+
+
+
 
 A Basic Example
 ------
