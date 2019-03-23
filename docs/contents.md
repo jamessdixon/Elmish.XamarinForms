@@ -3,5 +3,7 @@
 * [Views](views.html)
 * [Models](models.html)
 * [Update and Messages](update.html)
+* [Traces and Crashes](logging.html)
+* [Unit testing](testing.html)
 * [Tools](tools.html)
 * [Further Resources](index.html#further-resources)

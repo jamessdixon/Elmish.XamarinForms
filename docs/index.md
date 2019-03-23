@@ -11,8 +11,6 @@ to build Xamarin.Forms applications for iOS, Android, Mac and more.  The approac
 
 > The amount of code I'm *not* writing is great!  [@jimbobbennett](https://github.com/jimbobbennett/)
 
-**This project is a sample and may change.**
-
 {% include_relative contents.md %}
 
 Getting started
@@ -32,21 +30,43 @@ Getting started
 
        SqueakyApp/SqueakyApp.sln
 
-By default iOS and Android projects are created. For WPF apps use `--WPF`, for example:
+By default iOS and Android projects are created. But you can also target WPF with `--WPF`, UWP with `--UWP`, macOS with `--macOS` and/or GTK with `--GTK`. Here some common examples, but feel free to change the targets to the ones you require:
 
-   Android only: dotnet new fabulous-app -n SqueakyApp --iOS=false
-   iOS only:     dotnet new fabulous-app -n SqueakyApp --Android=false
-   WPF only:     dotnet new fabulous-app -n SqueakyApp --WPF --Android=false --iOS=false
+Android only:
+
+    dotnet new fabulous-app -n SqueakyApp --iOS=false
    
+iOS only:
+
+    dotnet new fabulous-app -n SqueakyApp --Android=false
+   
+WPF only:
+
+    dotnet new fabulous-app -n SqueakyApp --WPF --Android=false --iOS=false
+
+UWP only:
+
+    dotnet new fabulous-app -n SqueakyApp --UWP --Android=false --iOS=false
+   
+macOS only:
+
+    dotnet new fabulous-app -n SqueakyApp --macOS --Android=false --iOS=false
+
+GTK only:
+
+    dotnet new fabulous-app -n SqueakyApp --GTK --Android=false --iOS=false
+
+All 6 platforms:
+
+    dotnet new fabulous-app -n SqueakyApp --WPF --UWP --macOS --GTK
+
 5. If you are using Visual Studio for Mac and you want to start with File -> New, make sure you target ".NET Standard" to add the references to Fabulous:
        
        File -> New Solution
-       
        Multiplatform App -> Blank Forms App (F#)
-       
        Shared Code -> Use .NET Standard
        
-       <img src="https://user-images.githubusercontent.com/1394644/45930814-97bfce80-bf32-11e8-8f7a-ebcbcb0247fa.png" width="100"> 
+<img src="https://user-images.githubusercontent.com/1394644/45930814-97bfce80-bf32-11e8-8f7a-ebcbcb0247fa.png" width="500"> 
 
 A Basic Example
 ------
@@ -76,10 +96,16 @@ let update (msg: Msg) (model: Model) =
 
 /// The view function giving updated content for the page
 let view (model: Model) dispatch =
-    if model.Pressed then
-        View.Label(text="I was pressed!")
-    else
-        View.Button(text="Press Me!", command=(fun () -> dispatch Pressed))
+    View.ContentPage(
+        content=View.StackLayout(
+            children=[
+                if model.Pressed then
+                    yield View.Label(text="I was pressed!")
+                else
+                    yield View.Button(text="Press Me!", command=(fun () -> dispatch Pressed))
+            ]
+        )
+    )
 
 type App () as app =
     inherit Application ()

@@ -56,7 +56,9 @@ For example, here is one pattern for a timer loop that can be turned on/off:
 
 ```fsharp
 type Model = 
-    { TimerOn: bool }
+    { TimerOn: bool
+      Count: int
+      Step: int }
         
 type Message = 
     | TimedTick
@@ -67,7 +69,7 @@ let timerCmd =
             return TimedTick }
     |> Cmd.ofAsyncMsg
 
-let init () = { TimerOn = false }, Cmd.none
+let init () = { TimerOn = false; Count = 0; Step = 1 }, Cmd.none
     
 let update msg model =
     match msg with
@@ -126,4 +128,167 @@ let backgroundCmd =
         let res = ...
         return msg
     })
+```
+
+Optional commands
+------
+
+There might be cases where before a message is sent, you need to check if you want to send it (e.g. check user's preferences, ask user's permission, ...)
+
+Fabulous has 2 helper functions for this:
+
+- `Cmd.ofMsgOption`
+
+```fsharp
+let autoSaveCmd =
+    match userPreference.IsAutoSaveEnabled with
+    | false -> None
+    | true ->
+        autoSave()
+        Some Msg.AutoSaveDone
+
+let update msg model =
+    match msg with
+    | TimedTick -> model, (Cmd.ofMsgOption autoSaveCmd)
+    | AutoSaveDone -> ...
+```
+
+- `Cmd.ofAsyncMsgOption`
+
+```fsharp
+let takePictureCmd = async {
+    try
+        let! picture = takePictureAsync()
+        Some (Msg.PictureTaken picture)
+    with
+    | exn ->
+        do! displayAlert("Exception: " + exn.Message)
+        None
+}
+
+let update msg model =
+    match msg with
+    | TakePicture -> model, (Cmd.ofAsyncMsgOption takePictureCmd)
+    | PictureTaken -> ...
+```
+
+Webrequests in a Command
+----
+Sometimes it is needed to make some web requests. Which tool you use here does not matter. For example you could use FSharp.Data to make HttpRequests.
+These are the steps that you have to do, to make it work:
+1. Create a case in the message type for a successful and failure webrequests
+```fsharp
+type Msg =
+    | LoginClicked
+    | LoginSuccess
+    | AuthError
+```
+2. Implement the Command and return the correct message
+```fsharp
+let authUser (username : string) (password : string) =
+    async {
+        do! Async.SwitchToThreadPool()
+        // make your http call
+        // FSharp.Data.HTTPUtil is used here
+        let! response = Http.AsyncRequest
+                            (url = URL, body = TextRequest """ {"username": "test", "password": "testpassword"} """,
+                             httpMethod = "POST", silentHttpErrors = true)
+        let r =
+            match response.StatusCode with
+            | 200 -> LoginSuccess
+            | _ -> AuthError
+        return r
+    }
+    |> Cmd.ofAsyncMsg
+```
+3. Call the Command from update e.g. when a button is clicked
+```fsharp
+let update msg model =
+    match msg with
+    | LoginClicked -> { model with IsRunning = true }, authUser model.Username model.Password // Call the Command
+    | LoginSuccess ->
+        { model with IsLoggedIn = true
+                     IsRunning = false }, Cmd.none
+    | AuthError ->
+        { model with IsLoggedIn = false
+                     IsRunning = false }, Cmd.none
+```
+4. Create your view as you need
+```fsharp
+match model.IsLoggedIn with
+| true -> LoggedInSuccesful
+| false -> LoginView
+```
+
+Platform-specific dispatch
+-----
+
+Some platform-specific features (like deep linking, memory warnings, ...) are not available in Xamarin.Forms, and need you to implement them in the corresponding app projet.  
+In this case, you might want to dispatch a message from the app project to Fabulous to start a shared logic between platforms (to warn user, ...).
+
+To allow for this kind of use case, the `dispatch` function is exposed as a `Dispatch(msg)` method by the `ProgramRunner`. By default this runner is not accessible, but you can make a read-only property to let apps access it.
+
+```fsharp
+type App() as app =
+    inherit Application()
+
+    let runner =
+        Program.mkProgram init update view
+        |> Program.runWithDynamicView app
+
+    member __.Program = runner // Add this line
+```
+
+Once done, you can access it in the app project
+
+- Android
+```fsharp
+[<Activity>]
+type MainActivity() =
+    inherit FormsApplicationActivity()
+
+    // Store the App instance
+    let mutable _app: App option = None
+
+    override this.OnCreate (bundle: Bundle) =
+        base.OnCreate (bundle)
+
+        Forms.Init (this, bundle)
+
+        // Initialize the app and store its reference
+        let app = new App()
+        this.LoadApplication(app)
+        _app <- Some app
+
+    override this.OnTrimMemory(level) =
+        // If the app is initialized, dispatch the message
+        match _app with
+        | Some app -> app.Program.Dispatch(Msg.ReceivedLowMemoryWarning)
+        | None -> ()
+```
+
+- iOS
+```fsharp
+[<Register("AppDelegate")>]
+type AppDelegate () =
+    inherit FormsApplicationDelegate ()
+
+    // Store the App instance
+    let mutable _app: App option = None
+
+    override this.FinishedLaunching (uiApp, options) =
+        Forms.Init()
+
+        // Initialize the app and store its reference
+        let app = new AllControls.App()
+        this.LoadApplication (app)
+        _app <- Some app
+
+        base.FinishedLaunching(uiApp, options)
+
+    override this.ReceiveMemoryWarning(uiApp) =
+        // If the app is initialized, dispatch the message
+        match _app with
+        | Some app -> app.Program.Dispatch(Msg.ReceivedLowMemoryWarning)
+        | None -> ()
 ```

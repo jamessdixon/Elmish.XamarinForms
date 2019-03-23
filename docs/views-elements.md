@@ -119,7 +119,7 @@ View.FlexLayout(
         ).FlexOrder(-1).FlexAlignSelf(FlexAlignSelf.Center)
 
         View.Label(margin = Thickness(0.0, 4.0)).FlexGrow(1.0)
-        View.Button(text = "Learn More", fontSize = "Large", cornerRadius = 20) ])
+        View.Button(text = "Learn More", fontSize = "Large", cornerRadius = 20)
     ]
 )
 ```
@@ -164,6 +164,40 @@ to automatically move to the visible portion of the screen when the keyboard is 
 
 ```fsharp
 View.ScrollView(View.StackLayout(padding=20.0, children= ...) )
+```
+
+The scroll position can be setted programmatically through the attribute `scrollTo`. This attribute needs the X and Y coordinates to scroll to and an indication whether it should be animated or not. (`Animated`/`NotAnimated`)
+
+Note: Fabulous will try to scroll to these coordinates every time it needs to refresh the UI. Making use of the optional argument is recommended.
+
+You can also subscribe to the event `Scrolled` to be notified when the scrolling is over.
+
+```fsharp
+View.ScrollView(content=(...),
+    ?scrollTo=(if model.ShouldScroll then Some (500.0, 0.0, Animated) else None),
+    scrolled=(fun args -> dispatch Scrolled))
+```
+
+For more complex scenarios, you can directly use the method from Xamarin.Forms [`ScrollView.ScrollToAsync(x, y, animated)`](https://docs.microsoft.com/dotnet/api/xamarin.forms.scrollview.scrolltoasync?view=xamarin-forms)
+This method offers the advantage of being awaitable until the end of the scrolling.
+To do this, a reference to the underlying ScrollView is needed.
+
+
+```fsharp
+let scrollViewRef = ViewRef<ScrollView>()
+
+View.ScrollView(ref=scrollViewRef, content=(...))
+
+// Some time later (usually in a Cmd)
+let scrollToCoordinates x y animated =
+    async {
+        match scrollViewRef.TryValue with
+        | None ->
+            return None
+        | Some scrollView ->
+            do! scrollView.ScrollToAsync(x, y, animated) |> Async.AwaitTask
+            return (Some Scrolled)
+    } |> Cmd.ofAsyncMsgOption
 ```
 
 See also:
@@ -534,32 +568,33 @@ See also:
 Pop-ups
 -------------------
 
-Pop-ups are a special case in Fabulous.  
-They are part of the view, but don't follow the same lifecycle as the rest of the UI.
+Pop-ups are a special case in Fabulous: they are part of the view, but don't follow the same lifecycle as the rest of the UI. In Xamarin.Forms pop-ups are exposed through 2 methods of the current page: `DisplayAlert` and `DisplayActionSheet`.
 
-In Xamarin.Forms, those pop-ups are exposed through 2 methods of the current page, `DisplayAlert` and `DisplayActionSheet`.
+In Fabulous we only describe what a page should look like and have no access to UI elements. As such, there is no direct implementation of those 2 methods in Fabulous but instead we can use the static property `Application.Current.MainPage` exposed by Xamarin.Forms.
 
-In Fabulous, we only describe what a page should look like and have no access to UI elements.  
-As such, there is no direct implementation of those 2 methods in Fabulous.
-
-Instead, we can use the static property `Application.Current.MainPage` exposed by Xamarin.Forms.
-
-Here is an example of the use of a confirmation pop-up.
+Here is an example of the use of a confirmation pop-up - note the requirement of `Cmd.AsyncMsg` so as not to block on the UI thread:
 ```fsharp
-let! confirm = Application.Current.MainPage.DisplayAlert(
-                   "Share this contact",
-                   "Are you sure you want to share this contact?",
-                   "Yes", "No")
-               |> Async.AwaitTask
+type Msg =
+    | DisplayAlert
+    | AlertResult of bool
 
-match confirm with
-| true -> (...)
-| false -> (...)
+let update (msg : Msg) (model : Model) =
+    match msg with
+    | DisplayAlert ->
+        let alertResult = async {
+            let! alert =
+                Application.Current.MainPage.DisplayAlert("Display Alert", "Confirm", "Ok", "Cancel")
+                |> Async.AwaitTask
+            return AlertResult alert }
+
+        model, Cmd.ofAsyncMsg alertResult
+
+    | AlertResult alertResult -> ... // Do something with the result
 ```
 
-_Why don't we add an Fabulous wrapper for those?_  
-Doing so would only end up duplicating the existing methods and compel us to maintain these in sync with Xamarin.Forms.  
-See https://github.com/fsprojects/Fabulous/pull/147 for more information
+_Why don't we add a Fabulous wrapper for those?_
+Doing so would only end up duplicating the existing methods and compel us to maintain these in sync with Xamarin.Forms.
+See [Pull Request #147](https://github.com/fsprojects/Fabulous/pull/147) for more information
 
 See also:
 

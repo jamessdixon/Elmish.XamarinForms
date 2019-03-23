@@ -1,12 +1,12 @@
 <Project>
   <!-- NuGet Specs -->
   <PropertyGroup>
-    <Version>0.24.0</Version>
-    <Description>Added StyleClass property (https://github.com/fsprojects/Fabulous/pull/209)</Description>
+    <Version>0.33.1</Version>
     <Authors>Fabulous Contributors</Authors>
-    <PackageVersion>0.24.0</PackageVersion>
+    <PackageVersion>0.33.1</PackageVersion>
+    <PackageReleaseNotes>[LiveUpdate] Fixed a bug where any changes throw a NullReferenceException (https://github.com/fsprojects/Fabulous/pull/355)</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
-    <PackageLicenseUrl>https://github.com/fsprojects/Fabulous/blob/master/LICENSE.md</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/fsprojects/Fabulous</PackageProjectUrl>
     <PackageTags>Xamarin.Forms;F#;Elmish;Elm;$(PackageTags)</PackageTags>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

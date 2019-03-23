@@ -9,3 +9,9 @@ paket-files
 
 build_output/
 .idea/
+testapp*/
+tests/Fabulous.Cli\.Tests/data/
+
+samples/CounterApp/CounterApp/CounterApp\.args\.txt
+
+samples/TicTacToe/TicTacToe/TicTacToe\.args\.txt

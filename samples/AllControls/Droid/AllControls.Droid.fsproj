@@ -17,7 +17,6 @@
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
     <SelectedDevice>Google Pixel 2</SelectedDevice>
     <DefaultDevice>Android_Accelerated_x86_Nougat</DefaultDevice>
     <Name>AllControls.Droid</Name>
@@ -164,19 +163,25 @@
     </Reference>
     <Reference Include="Xamarin.Forms.Xaml">
       <HintPath>../../../packages/androidapp/Xamarin.Forms/lib/MonoAndroid10/Xamarin.Forms.Xaml.dll</HintPath>
-    </Reference>
+    </Reference> 
     <Reference Include="FSharp.Core">
       <HintPath>../../../packages/androidapp/FSharp.Core/lib/netstandard1.6/FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Data">
+      <HintPath>../../../packages/androidapp/FSharp.Data/lib/netstandard2.0/FSharp.Data.dll</HintPath>
     </Reference>
     <ProjectReference Include="..\AllControls\AllControls.fsproj">
       <Project>{13f140d6-2d21-41be-ac90-4b14d8c16a47}</Project>
       <Name>AllControls</Name>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Fabulous.CustomControls\Fabulous.CustomControls.fsproj">
+      <Project>{7FF328BB-9318-4C11-8A9A-37DD98EAB35B}</Project>
+      <Name>Fabulous.CustomControls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Fabulous.Core\Fabulous.Core.fsproj">
-      <Project>{AE045D79-7FF3-45F3-BFD0-305542A1C728}</Project>
+      <Project>{B459AFAD-BB5B-43C3-BD86-609E8DB3E3FD}</Project>
       <Name>Fabulous.Core</Name>
-      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -1,3 +1,78 @@
+#### 0.33.1
+
+* [LiveUpdate] Fixed a bug where any changes throw a NullReferenceException (https://github.com/fsprojects/Fabulous/pull/355)
+
+#### 0.33.0
+
+* [DynamicViews] Added SizeChangedEventArgs to give access to the new size when SizeChanged is raised (https://github.com/fsprojects/Fabulous/pull/336)
+* [DynamicViews] Added an extension point to give a new default implementation for a control (https://github.com/fsprojects/Fabulous/pull/342)
+* [LiveUpdate] Updated Interpreter to fix some bugs. Plus changed the watcher with a new and easier command line syntax (https://github.com/fsprojects/Fabulous/pull/338)
+* [Fabulous.Core] Fixed a bug (possibly from Mono) that made Fabulous act weird on some Android devices (https://github.com/fsprojects/Fabulous/pull/347)
+* [Templates] Fixed the consistency of the namespace between the files in the WPF template (https://github.com/fsprojects/Fabulous/pull/349)
+
+#### 0.32.0
+
+* [Fabulous.Core] Added better type annotation to make the functions init and update easier to read (https://github.com/fsprojects/Fabulous/pull/313)
+* [Template] Added new UWP template (https://github.com/fsprojects/Fabulous/pull/324)
+* [Fabulous.Core] Added new helpers to extract data from ViewElement. Helpful for unit testing the views (https://github.com/fsprojects/Fabulous/pull/325)
+* [Xamarin.Forms controls] Added the property ScrollTo and the event Scrolled for ScrollView (https://github.com/fsprojects/Fabulous/pull/332)
+* [Xamarin.Forms controls] Added the events ChildrenReordered, MeasureInvalidated, Focused, SizeChanged and Unfocused for VisualElement (https://github.com/fsprojects/Fabulous/pull/327)
+* [Fabulous.Core] Changed the modules behind View; The builder functions are no longer hidden from IntelliSense (https://github.com/fsprojects/Fabulous/pull/325)
+* [Xamarin.Forms controls] Fixed the update of TableSection.Title (https://github.com/fsprojects/Fabulous/pull/330)
+
+#### 0.31.0
+
+* [Fabulous.Core] Added XML docs for Fabulous helpers (https://github.com/fsprojects/Fabulous/pull/284)
+* [Xamarin.Forms controls] Fixed the TitleView attached property on Page (https://github.com/fsprojects/Fabulous/pull/305)
+* [Xamarin.Forms controls] Fixed the Accelerator property on MenuItem (https://github.com/fsprojects/Fabulous/pull/301)
+* [Template] Fixed a typo in assembly name in macOS project (https://github.com/fsprojects/Fabulous/pull/300)
+* [Template] Fixed an issue where NuGet restore would fail due to a space in path on Windows (https://github.com/fsprojects/Fabulous/pull/290)
+* [LiveUpdate] Fixed: Using ViewRef produces a "No member found for key Fabulous.DynamicViews.ViewRef" error (https://github.com/fsprojects/Fabulous/pull/286)
+* [LiveUpdate] Fixed: Using a list a "No member found for key Microsoft.FSharp.Collections.FSharpList" error (https://github.com/fsprojects/Fabulous/pull/286)
+* [LiveUpdate] Fixed: Calling a function that takes unit from a module in a separate dll produces a "No member found for key" error (https://github.com/fsprojects/Fabulous/pull/286)
+
+#### 0.30.0
+
+* Added support for Xamarin.Forms 3.4 (https://github.com/fsprojects/Fabulous/pull/257)
+* Added new GTK template (https://github.com/fsprojects/Fabulous/pull/268)
+* Changed behavior of SKCanvasView "invalidate" (always triggers an invalidation while the property is true) (https://github.com/fsprojects/Fabulous/pull/262)
+* Updated WPF template to target .NET Framework 4.7.2 by default (https://github.com/fsprojects/Fabulous/pull/267)
+* Updated NuGet inside the template to v4.9.2 (https://github.com/fsprojects/Fabulous/pull/271)
+* Fixed MacOS template by adding some missing references (https://github.com/fsprojects/Fabulous/pull/276)
+
+#### 0.29.0
+
+BREAKING CHANGES:
+* Replaced Minimum and Maximum properties of Slider/Stepper by a single MinimumMaximum property (tuple) (https://github.com/fsprojects/Fabulous/pull/246)
+* Replaced the "fscd" daemon (embedded in the Fabulous.LiveUpdate package) by a new dotnet CLI tool "fabulous-cli". See https://fsprojects.github.io/Fabulous/tools.html for more informations. (https://github.com/fsprojects/Fabulous/pull/247)
+
+#### 0.28.0
+
+* Added a dispatch method accessible in the app projects (https://github.com/fsprojects/Fabulous/pull/240)
+* Added a debounche helper function (https://github.com/fsprojects/Fabulous/pull/237)
+
+#### 0.27.1
+
+* Fixed a cast issue in ViewRef&lt;T&gt;.TryValue (https://github.com/fsprojects/Fabulous/pull/235)
+
+#### 0.27.0
+
+* Added TextChanged event to EntryCell (https://github.com/fsprojects/Fabulous/pull/227)
+
+#### 0.26.0
+
+* Added Cmd.ofMsgOption and Cmd.ofAsyncMsgOption (https://github.com/fsprojects/Fabulous/pull/224)
+* Fixed Microsoft.CSharp warnings when building a project created with the template (https://github.com/fsprojects/Fabulous/pull/216)
+* Fixed a bug in ListViewGrouped that prevented groups to be updated (https://github.com/fsprojects/Fabulous/pull/229)
+* Fixed description of the NuGet packages (https://github.com/fsprojects/Fabulous/pull/220)
+
+#### 0.25.0
+
+* Added "CurrentPage" and "CurrentPageChanged" to TabbedPage and CarouselPage (https://github.com/fsprojects/Fabulous/pull/215)
+* Added support for byte array with Image.Source (https://github.com/fsprojects/Fabulous/pull/217)
+* Improved exception protection in LiveUpdate (https://github.com/fsprojects/Fabulous/pull/214)
+* Fixed an issue in LiveUpdate preventing the use of some kinds of discriminated unions (https://github.com/fsprojects/Fabulous/pull/213)
+
 #### 0.24.0
 
 * Added StyleClass property (https://github.com/fsprojects/Fabulous/pull/209)

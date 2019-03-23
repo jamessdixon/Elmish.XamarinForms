@@ -1,3 +1,13 @@
+# Contributing
+
+Contributing is easy:
+
+1. [Fork](https://help.github.com/articles/fork-a-repo/) the repository
+2. Create a new branch for the feature/fix and give it an appropriate name `my_fabulous_fix`
+3. Do your best work
+4. Build/Test as per the below
+5. Create a pull request back to `Fabulous/master`
+
 # Dev Notes
 
 ## Dev Notes - Prerequisites
@@ -71,6 +81,21 @@ On Windows:
 ```
 .\build Test
 ```
+
+## Dev Notes - Testing LiveUpdate
+
+Use the CounterApp to test.  To run the equivalent of the `fabulous` CLI tool use this:
+
+    cd Samples\CounterApp\CounterApp
+    adb -d forward  tcp:9867 tcp:9867
+    dotnet run --project ..\..\..\src\Fabulous.Cli\Fabulous.Cli.fsproj -- --watch --send 
+
+If you want to update your (global!) install of the `fabulous-cli` tool, first bump the version number to avoid clashes, then:
+
+    dotnet pack src\Fabulous.Cli
+    dotnet tool uninstall --global fabulous-cli  
+    dotnet tool install --global --add-source C:\GitHub\dsyme\Fabulous\src\Fabulous.Cli\bin\Debug\ fabulous-cli
+    fabulous --watch --send
 
 ## Dev Notes - Releasing
 

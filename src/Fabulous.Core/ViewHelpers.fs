@@ -2,15 +2,13 @@
 namespace Fabulous.DynamicViews 
 
 open Fabulous.DynamicViews
+open System
 open System.Collections.Generic
-
-[<System.Obsolete("Please change 'Xaml.XYZ' to 'View.XYZ'", error=false)>]
-type Xaml = Fabulous.DynamicViews.View 
+open System.Threading
+open Xamarin.Forms
 
 [<AutoOpen>]
 module SimplerHelpers = 
-    open Xamarin.Forms
-
     type internal Memoizations() = 
          static let t = Dictionary<obj,System.WeakReference<obj>>(HashIdentity.Structural)
          static member T = t
@@ -72,42 +70,26 @@ module SimplerHelpers =
              Memoizations.Add(key, box res)
              res
 
-    type ViewElement with 
-        member x.With(?horizontalOptions: Xamarin.Forms.LayoutOptions, ?verticalOptions: Xamarin.Forms.LayoutOptions, ?margin: obj, ?gestureRecognizers: ViewElement list, 
-                      ?anchorX: double, ?anchorY: double, ?backgroundColor: Xamarin.Forms.Color, ?heightRequest: double, ?inputTransparent: bool, 
-                      ?isEnabled: bool, ?isVisible: bool, ?minimumHeightRequest: double, ?minimumWidthRequest: double, ?opacity: double, 
-                      ?rotation: double, ?rotationX: double, ?rotationY: double, ?scale: double, ?style: Xamarin.Forms.Style, 
-                      ?translationX: double, ?translationY: double, ?widthRequest: double, ?resources: (string * obj) list, 
-                      ?styles: Xamarin.Forms.Style list, ?styleSheets: Xamarin.Forms.StyleSheets.StyleSheet list, ?classId: string, ?styleId: string) = 
-            let x = match horizontalOptions with None -> x | Some opt -> x.HorizontalOptions(opt)
-            let x = match verticalOptions with None -> x | Some opt -> x.VerticalOptions(opt)
-            let x = match margin with None -> x | Some opt -> x.Margin(opt)
-            let x = match gestureRecognizers with None -> x | Some opt -> x.GestureRecognizers(opt)
-            let x = match anchorX with None -> x | Some opt -> x.AnchorX(opt)
-            let x = match anchorY with None -> x | Some opt -> x.AnchorY(opt)
-            let x = match backgroundColor with None -> x | Some opt -> x.BackgroundColor(opt)
-            let x = match heightRequest with None -> x | Some opt -> x.HeightRequest(opt)
-            let x = match inputTransparent with None -> x | Some opt -> x.InputTransparent(opt)
-            let x = match isEnabled with None -> x | Some opt -> x.IsEnabled(opt)
-            let x = match isVisible with None -> x | Some opt -> x.IsVisible(opt)
-            let x = match minimumHeightRequest with None -> x | Some opt -> x.MinimumHeightRequest(opt)
-            let x = match minimumWidthRequest with None -> x | Some opt -> x.MinimumWidthRequest(opt)
-            let x = match opacity with None -> x | Some opt -> x.Opacity(opt)
-            let x = match rotation with None -> x | Some opt -> x.Rotation(opt)
-            let x = match rotationX with None -> x | Some opt -> x.RotationX(opt)
-            let x = match rotationY with None -> x | Some opt -> x.RotationY(opt)
-            let x = match scale with None -> x | Some opt -> x.Scale(opt)
-            let x = match style with None -> x | Some opt -> x.Style(opt)
-            let x = match translationX with None -> x | Some opt -> x.TranslationX(opt)
-            let x = match translationY with None -> x | Some opt -> x.TranslationY(opt)
-            let x = match widthRequest with None -> x | Some opt -> x.WidthRequest(opt)
-            let x = match resources with None -> x | Some opt -> x.Resources(opt)
-            let x = match styles with None -> x | Some opt -> x.Styles(opt)
-            let x = match styleSheets with None -> x | Some opt -> x.StyleSheets(opt)
-            let x = match styleSheets with None -> x | Some opt -> x.StyleSheets(opt)
-            let x = match classId with None -> x | Some opt -> x.ClassId(opt)
-            let x = match styleId with None -> x | Some opt -> x.StyleId(opt)
-            x
+    /// Debounce multiple calls to a single function
+    let debounce<'T> =
+        let memoizations = Dictionary<obj, CancellationTokenSource>(HashIdentity.Structural)
+        fun (timeout: int) (fn: 'T -> unit) value ->
+            let key = fn.GetType()
+            match memoizations.TryGetValue(key) with
+            | true, previousCts -> previousCts.Cancel()
+            | _ -> ()
+
+            let cts = new CancellationTokenSource()
+            memoizations.[key] <- cts
+
+            Device.StartTimer(TimeSpan.FromMilliseconds(float timeout), (fun () ->
+                match cts.IsCancellationRequested with
+                | true -> ()
+                | false ->
+                    memoizations.Remove(key) |> ignore
+                    fn value
+                false // Do not let the timer trigger a second time
+            ))
 
     let ContentsAttribKey = AttributeKey<(obj -> ViewElement)> "Stateful_Contents"
 
